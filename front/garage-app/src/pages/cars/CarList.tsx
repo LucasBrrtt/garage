@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Title from '../../components/Title';
 import Table from 'react-bootstrap/Table';
 import { Link } from 'react-router-dom'
@@ -6,27 +6,20 @@ import Button from 'react-bootstrap/Button';
 import Modal from 'react-bootstrap/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPen, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
+import api from '../../api/car'
 
-const cars = [
-    {
-        id: 1,
-        nome: 'Uno',
-        marca: 'Fiat',
-        cor: 'Preto',
-        placa: '123',
-        ano: '1999'
-    },
-    {
-        id: 2,
-        nome: 'Fusca',
-        marca: 'Fiat',
-        cor: 'Preto',
-        placa: '123',
-        ano: '1999'
-    }
-];
+interface CarProps {
+    id: string;
+    name: string;
+    brand: string;
+    color: string;
+    plate: string;
+    year: string;
+}
 
 export default function CarList() {
+
+    const [carList, setCarList] = useState<CarProps[]>([])
     const [carToDelete, setCarToCarDelete] = useState(Object)
     const [show, setShow] = useState(false);
 
@@ -38,10 +31,23 @@ export default function CarList() {
     function handleCloseDeleteModal() {
         setShow(false)
     }
+    
+    const getCars = async () => {
+        const response = await api.get('car');
+        return response.data
+    }
 
     function handleDelete() {
         console.log(carToDelete);
     }
+
+    useEffect(() => {
+        const getCarsValue = async () => {
+            const value = await getCars();
+            if (value) setCarList(value);
+        };
+        getCarsValue();
+    }, []);
 
     return (
         <>
@@ -66,13 +72,13 @@ export default function CarList() {
                     </tr>
                 </thead>
                 <tbody>
-                    {cars.map((x) => (
+                    {carList.map((x) => (
                         <tr key={x.id}>
-                            <td>{x.nome}</td>
-                            <td>{x.marca}</td>
-                            <td>{x.cor}</td>
-                            <td>{x.placa}</td>
-                            <td>{x.ano}</td>
+                            <td>{x.name}</td>
+                            <td>{x.brand}</td>
+                            <td>{x.color}</td>
+                            <td>{x.plate}</td>
+                            <td>{x.year}</td>
                             <td>
                                 <div>
                                     <Link to={`/detalhe/${x.id}`}>
