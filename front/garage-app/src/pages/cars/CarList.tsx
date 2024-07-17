@@ -7,6 +7,7 @@ import Modal from 'react-bootstrap/Modal';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faPen, faTimes, faTrash } from '@fortawesome/free-solid-svg-icons';
 import api from '../../api/car'
+import { AxiosError } from 'axios';
 
 interface CarProps {
     id: string;
@@ -18,7 +19,6 @@ interface CarProps {
 }
 
 export default function CarList() {
-
     const [carList, setCarList] = useState<CarProps[]>([])
     const [carToDelete, setCarToCarDelete] = useState(Object)
     const [show, setShow] = useState(false);
@@ -31,14 +31,27 @@ export default function CarList() {
     function handleCloseDeleteModal() {
         setShow(false)
     }
-    
+
     const getCars = async () => {
-        const response = await api.get('car');
+        const response = await api.get('car')
         return response.data
     }
 
-    function handleDelete() {
-        console.log(carToDelete);
+    async function handleDelete() {
+        try {
+            await api.delete(`car/${carToDelete.id}`)
+            setShow(false)
+
+            const value = await getCars();
+            setCarList(value)
+        } catch (err) {
+            if (err instanceof AxiosError) {
+                console.log('Erro Axios:', err.message);
+                console.log('Status do erro:', err.response?.status);
+            } else {
+                console.error('Erro desconhecido:', err);
+            }
+        }
     }
 
     useEffect(() => {
@@ -108,7 +121,7 @@ export default function CarList() {
                         <FontAwesomeIcon icon={faTimes} /> {' '}
                         Fechar
                     </Button>
-                    <Button variant="danger" onClick={() => handleDelete()}>
+                    <Button variant="danger" onClick={ async () => await handleDelete()}>
                         <FontAwesomeIcon icon={faTrash} /> {' '}
                         Remover
                     </Button>
