@@ -108,11 +108,11 @@ export default function CarForm() {
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="plate">
                     <Form.Label>Placa</Form.Label>
-                    <Form.Control type="text" placeholder="PLACA DO CARRO" value={ plate } onChange={(e) => setPlate(e.target.value)} />
+                    <Form.Control type="text" placeholder="PLACA DO CARRO" value={ plate } onChange={(e) => setPlate(e.target.value.slice(0, 7))} />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="year">
                     <Form.Label>Ano</Form.Label>
-                    <Form.Control type="text" placeholder="ANO DO CARRO" value={ year } onChange={(e) => setYear(e.target.value)} />
+                    <Form.Control type="text" placeholder="ANO DO CARRO" value={ year } onChange={(e) => setYear(e.target.value.replace(/\D/g, '').slice(0, 4))} />
                 </Form.Group>
             </Form>
 
