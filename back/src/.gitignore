@@ -458,3 +458,12 @@ $RECYCLE.BIN/
 # Arquivos de build do .NET
 bin/
 obj/
+
+/back/src/Garage.API/bin/Debug/net8.0/Garage.API.exe
+/back/src/Garage.API/bin/Debug/net8.0/Garage.API.dll
+
+/back/src/Garage.API/bin/Debug/net8.0/*.exe
+/back/src/Garage.API/bin/**/*.exe
+/back/src/Garage.API/bin/
+
+*.exe
