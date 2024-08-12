@@ -13,10 +13,15 @@ import { AxiosError } from 'axios';
 interface CarObject {
     id?: string;
     name: string;
-    brand: string;
+    brandId: number;
     color: string;
     plate: string;
     year: string;
+}
+
+interface Option {
+    id: string;
+    name: string;
 }
 
 export default function CarForm() {
@@ -29,10 +34,12 @@ export default function CarForm() {
     const [plate, setPlate] = useState("");
     const [year, setYear] = useState("");
 
+    const [options, setOptions] = useState<Option[]>([]);
+
     async function handleSubmit() {
         let carObject: CarObject = {
             name: name,
-            brand: brand,
+            brandId: Number(brand),
             color: color,
             plate: plate,
             year: year
@@ -62,16 +69,19 @@ export default function CarForm() {
         return response.data
     }
 
+    const getBrands = async () => {
+        const response = await api.get(`brand`)
+        return response.data
+    }
+
     useEffect(() => {
         if (id) {
             const getCarsValue = async () => {
                 const value = await getCars();
 
-                if (value){
-                    console.log(value.name);
-                    
+                if (value) {
                     setName(value.name)
-                    setBrand(value.brand)
+                    setBrand(value.brand.id)
                     setColor(value.color)
                     setPlate(value.plate)
                     setYear(value.year)
@@ -79,6 +89,12 @@ export default function CarForm() {
             };
             getCarsValue();
         }
+
+        const getBrandsValue = async () => {
+            const value = await getBrands();
+            setOptions(value)
+        }
+        getBrandsValue();
     }, []);
 
     return (
@@ -96,23 +112,35 @@ export default function CarForm() {
             <Form>
                 <Form.Group className="mb-3" controlId="name">
                     <Form.Label>Nome</Form.Label>
-                    <Form.Control type="text" placeholder="NOME DO CARRO" value={ name } onChange={(e) => setName(e.target.value)} />
+                    <Form.Control type="text" placeholder="NOME DO CARRO" value={name} onChange={(e) => setName(e.target.value)} />
                 </Form.Group>
+
                 <Form.Group className="mb-3" controlId="brand">
                     <Form.Label>Marca</Form.Label>
-                    <Form.Control type="text" placeholder="MARCA DO CARRO" value={ brand } onChange={(e) => setBrand(e.target.value)} />
+                    <Form.Select aria-label="Default select example"
+                        value={brand}
+                        onChange={(e) => setBrand(e.target.value)}
+                    >
+                        <option>Open this select menu</option>
+                        {options.map(option => (
+                            <option key={option.id} value={option.id}>
+                                {option.name}
+                            </option>
+                        ))}
+                    </Form.Select>
                 </Form.Group>
+
                 <Form.Group className="mb-3" controlId="color">
                     <Form.Label>Cor</Form.Label>
-                    <Form.Control type="text" placeholder="COR DO CARRO" value={ color } onChange={(e) => setColor(e.target.value)} />
+                    <Form.Control type="text" placeholder="COR DO CARRO" value={color} onChange={(e) => setColor(e.target.value)} />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="plate">
                     <Form.Label>Placa</Form.Label>
-                    <Form.Control type="text" placeholder="PLACA DO CARRO" value={ plate } onChange={(e) => setPlate(e.target.value.slice(0, 7))} />
+                    <Form.Control type="text" placeholder="PLACA DO CARRO" value={plate} onChange={(e) => setPlate(e.target.value.slice(0, 7))} />
                 </Form.Group>
                 <Form.Group className="mb-3" controlId="year">
                     <Form.Label>Ano</Form.Label>
-                    <Form.Control type="text" placeholder="ANO DO CARRO" value={ year } onChange={(e) => setYear(e.target.value.replace(/\D/g, '').slice(0, 4))} />
+                    <Form.Control type="text" placeholder="ANO DO CARRO" value={year} onChange={(e) => setYear(e.target.value.replace(/\D/g, '').slice(0, 4))} />
                 </Form.Group>
             </Form>
 

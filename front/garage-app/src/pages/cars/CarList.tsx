@@ -15,7 +15,17 @@ import CarFilter from './CarFilter';
 interface CarProps {
     id: string;
     name: string;
-    brand: string;
+    brand: {
+        id: string,
+        name: string
+    };
+    color: string;
+    plate: string;
+    year: string;
+}
+interface CarObjectFilter {
+    carName: string;
+    brandId: string;
     color: string;
     plate: string;
     year: string;
@@ -28,6 +38,22 @@ export default function CarList() {
     const [show, setShow] = useState(false)
     const [openModalComponet, setOpenModalComponet] = useState(false)
 
+    const [carFilter, setCarFilter] = useState<CarObjectFilter>({
+        carName: '',
+        brandId: '',
+        color: '',
+        plate: '',
+        year: ''
+    });    
+
+    const [carFilterAux, setCarFilterAux] = useState<CarObjectFilter>({
+        carName: '',
+        brandId: '',
+        color: '',
+        plate: '',
+        year: ''
+    });
+
     function handleShowDeleteModal(item: object) {
         setCarToCarDelete(item)
         setShow(true)
@@ -38,7 +64,7 @@ export default function CarList() {
     }
 
     const getCars = async () => {
-        const response = await api.get('car')
+        const response = await api.get('car', { params: carFilter })
         return response.data
     }
 
@@ -61,6 +87,7 @@ export default function CarList() {
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const searchValue = carListAux.filter((name) => {
+            
             return Object.values(name)
                 .join(' ')
                 .toLowerCase()
@@ -71,8 +98,35 @@ export default function CarList() {
     };
 
     const handleFilter = (updatedData: any) => {
-        console.log(updatedData);  
+        setCarFilter(prevFilter => ({
+            ...prevFilter,
+            carName: updatedData.name,
+            brandId: updatedData.brand,
+            color: updatedData.color,
+            plate: updatedData.plate,
+            year: updatedData.year
+        }));
     };
+
+    function save(){
+        setCarFilterAux(prevFilter => ({
+            ...prevFilter,
+            carName: carFilter.carName,
+            brandId: carFilter.brandId,
+            color: carFilter.color,
+            plate: carFilter.plate,
+            year: carFilter.year
+        }));
+
+        const getCarsValue = async () => {
+            const value = await getCars();
+            if (value) {
+                setCarList(value);
+                setCarListAux(value);
+            }
+        };
+        getCarsValue();    
+    }
 
     useEffect(() => {
         const getCarsValue = async () => {
@@ -127,7 +181,7 @@ export default function CarList() {
                     {carList.map((x) => (
                         <tr key={x.id}>
                             <td>{x.name}</td>
-                            <td>{x.brand}</td>
+                            <td>{x.brand.name}</td>
                             <td>{x.color}</td>
                             <td>{x.plate}</td>
                             <td>{x.year}</td>
@@ -153,9 +207,11 @@ export default function CarList() {
             <ModalComponet
                 isOpen={openModalComponet}
                 setModalOpen={() => setOpenModalComponet(!openModalComponet)}
+                save={ save }
             >
                 <CarFilter
                     onFormChange={ handleFilter }
+                    formFilterValues={ carFilterAux }
                  />
             </ModalComponet>
 

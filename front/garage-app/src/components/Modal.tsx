@@ -5,16 +5,21 @@ interface ModalProps {
     isOpen?: any;
     setModalOpen?: any;
     children?: any;
-    handleSubmit?: any;
+    save?: any;
 }
 
-export default function ModalComponet({ isOpen, setModalOpen, children, handleSubmit }: ModalProps) {
+export default function ModalComponet({ isOpen, setModalOpen, children, save }: ModalProps) {
 
     const [show, setShow] = useState(isOpen);
     
     useEffect(() => {
         setShow(isOpen);
     }, [isOpen]);
+
+    function saveAndClose(){
+        save();
+        setShow(setModalOpen);
+    }
 
     if (isOpen) {
         return (
@@ -30,10 +35,10 @@ export default function ModalComponet({ isOpen, setModalOpen, children, handleSu
 
                 <Modal.Footer>
                     <Button variant="secondary" onClick={ () => { return setShow(setModalOpen) } }>
-                        Close
+                        Fechar
                     </Button>
-                    <Button onClick={ handleSubmit } variant="primary">
-                        Save Changes
+                    <Button onClick={ saveAndClose } variant="primary">
+                        Filtrar
                     </Button>
                 </Modal.Footer>
 
